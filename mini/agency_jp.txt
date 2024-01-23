@@ -1,0 +1,3 @@
+agency_id varchar(100),agency_official_name varchar(100),agency_zip_number varchar(100),agency_address varchar(100),agency_president_pos varchar(100),agency_president_name varchar(100)
+'9240001009470','','','','',''
+'2000020343021','','','','',''

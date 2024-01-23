@@ -1,0 +1,2 @@
+feed_publisher_name varchar(100),feed_publisher_url varchar(100),feed_lang varchar(100),feed_start_date varchar(100),feed_end_date varchar(100),feed_version varchar(100)
+'広島電鉄','https://www.hiroden.co.jp/bus/','ja','20240109','20240709','20240109'

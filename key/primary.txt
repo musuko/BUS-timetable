@@ -1,0 +1,6 @@
+fare_attributes, fare_id
+routes, route_id
+routes_jp, route_id
+stops, stop_id
+stops_direction, stop_id
+trips, trip_id
