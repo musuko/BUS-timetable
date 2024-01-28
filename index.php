@@ -34,24 +34,23 @@ if (!isset($_SESSION['service_id'])) {
 if (!isset($_SESSION['trip_id'])) {
 	$_SESSION['trip_id']      = [];
 }
-if (!isset($_GET['route_id'])) {
+if (!isset($_GET['route_id']) || $_GET['route_id'][0] === "") {
 	$_GET['route_id'] = [];
 }
-if (!isset($_GET['stop_id'])) {
+if (!isset($_GET['stop_id']) || $_GET['stop_id'][0] === "") {
 	$_GET['stop_id'] = [];
 }
-if (!isset($_GET['service_id'])) {
+if (!isset($_GET['service_id']) || $_GET['service_id'][0] === "") {
 	$_GET['service_id'] = [];
 }
-if (!isset($_GET['trip_id'])) {
+if (!isset($_GET['trip_id']) || $_GET['trip_id'][0] === "") {
 	$_GET['trip_id'] = [];
 }
-
 //フォーム入力内容を変数に入れ
- $route_id    = $_GET['route_id']  ;
- $stop_id     = $_GET['stop_id']   ;
- $service_id  = $_GET['service_id'];
- $trip_id     = $_GET['trip_id']   ;
+$route_id    = $_GET['route_id']  ;
+$stop_id     = $_GET['stop_id']   ;
+$service_id  = $_GET['service_id'];
+$trip_id     = $_GET['trip_id']   ;
 //フォーム内容を記憶しておく
 if (filter_input(INPUT_GET, 'button') === 'bt_route_id') {
 	if ($_GET['route_id']  === NULL) {$route_id   = [];}
@@ -229,31 +228,16 @@ if ($_SESSION['route_id'] !== [] || $_SESSION['stop_id'] !== [] || $_SESSION['se
 		$trip = $earlybus[0];
 		$sql0 = ' SELECT  r.route_id, r.route_short_name, r.route_long_name, r.agency_id, t.service_id, 
 		rj.origin_stop, rj.destination_stop, rj.jp_parent_route_id, t.trip_id, t.trip_headsign, st.arrival_time, 
-		st.departure_time, st.stop_sequence, st.stop_headsign, s.stop_id, s.stop_name, sd.direction, 
-		cd.exception_type, cd.date
-		FROM routes r, routes_jp rj, trips t, stop_times st, stops s, stops_direction sd,  calendar_dates cd 
+		st.departure_time, st.stop_sequence, st.stop_headsign, s.stop_id, s.stop_name, sd.direction
+		FROM routes r, routes_jp rj, trips t, stop_times st, stops s, stops_direction sd
 		WHERE ' . $select . ' AND r.route_id = rj.route_id AND r.route_id = t.route_id AND t.trip_id = st.trip_id 
-		AND t.trip_id = ? AND st.stop_id = s.stop_id AND st.stop_id = sd.stop_id AND t.service_id = cd.service_id
-		ORDER BY st.departure_time ASC';
+		AND t.trip_id = ? AND st.stop_id = s.stop_id AND st.stop_id = sd.stop_id AND t.service_id <> t.trip_id
+		ORDER BY st.stop_sequence ASC';
 		$sql10 = $db->prepare($sql0);
 		$sql10->bindParam(1, $trip, PDO::PARAM_STR);
 		$sql10->execute();
 
 		foreach ($sql10 as $row) {
-			if ($row["service_id"] === $row['trip_id']) {
-				if ($row['exception_type'] === '1') {
-					$date = $row['date'].'運行';
-				} else {
-					$date = $row['date'].'運行無し';
-				}
-			} else {
-				if ($row['exception_type'] === '1') {
-					$date = $row["service_id"].$row['date'].'運行追加';
-				} else {
-					$date = $row["service_id"].'但し'.$row['date'].'運行無し';
-				}
-			} 
-
 			echo '<tr>';
 
 			echo '<td style="text-align: left">' . $row["route_long_name"] . " >>> " . $row["route_short_name"] . '</td>';	//route名
@@ -262,7 +246,7 @@ if ($_SESSION['route_id'] !== [] || $_SESSION['stop_id'] !== [] || $_SESSION['se
 			echo '<td style="text-align: left">' . $row[('departure_time')] . '</td>';	//出発時刻
 			echo '<td style="text-align: center">' . $row[('stop_sequence')] . '</td>';	//バス停順
 			echo '<td style="text-align: left">' . $row[('stop_headsign')] . '</td>';	//終点
-			echo '<td style="text-align: left">' . $date . '</td>';	//曜日
+			echo '<td style="text-align: left">' . $row["service_id"] . '</td>';	//曜日
 			echo '<td style="text-align: left"><a href="index.php?trip_id=' . $row[('trip_id')] . '">' . $row[('trip_id')] . '</a></td>';	//バス
 			echo '</tr>';
 		}
